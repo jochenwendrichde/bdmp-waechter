@@ -44,7 +44,7 @@ def parse(page):
                   re.findall(r'<th[^>]*>(.*?)</th>\s*<td[^>]*>(.*?)</td>', block, re.S)}
         events[eid] = {"titel": clean(title.group(1)), "datum": fields.get("Datum", ""),
                        "ort": fields.get("Ort", ""), "disziplinen": fields.get("Disziplinen", ""),
-                       "status": fields.get("Status", "")}
+                       "status": fields.get("Status", ""), "felder": fields}
     return events
 
 
@@ -103,6 +103,9 @@ def main():
 
     for k, v in hits.items():
         print(f"{v['datum']:>16}  {v['status']:<32} {v['titel']}")
+        for name, wert in v.pop("felder").items():
+            if name not in ("Datum", "Ort", "Disziplinen"):
+                print(f"{'':>18}{name}: {wert}")
     STATE.write_text(json.dumps({"events": hits}, ensure_ascii=False, indent=1, sort_keys=True) + "\n")
 
 
