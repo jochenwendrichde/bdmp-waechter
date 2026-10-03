@@ -48,6 +48,9 @@ def parse(page):
         # Nur-RO-Phase: eingeloggt steht dann eine Zeile "RO-Bereitschaft melden"
         if any(name.startswith("RO-") for name in fields):
             events[eid]["status"] += " (nur RO)"
+        # Echt offen nur mit grünem "Anmelden"-Button (gibt es nur eingeloggt)
+        elif events[eid]["status"] == OPEN and not re.search(r">\s*Anmelden\s*<", block):
+            events[eid]["status"] += " (ohne Anmelden-Button)"
     return events
 
 
