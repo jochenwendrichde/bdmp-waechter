@@ -45,6 +45,9 @@ def parse(page):
         events[eid] = {"titel": clean(title.group(1)), "datum": fields.get("Datum", ""),
                        "ort": fields.get("Ort", ""), "disziplinen": fields.get("Disziplinen", ""),
                        "status": fields.get("Status", ""), "felder": fields}
+        # Nur-RO-Phase: eingeloggt steht dann eine Zeile "RO-Bereitschaft melden"
+        if any(name.startswith("RO-") for name in fields):
+            events[eid]["status"] += " (nur RO)"
     return events
 
 
@@ -103,9 +106,7 @@ def main():
 
     for k, v in hits.items():
         print(f"{v['datum']:>16}  {v['status']:<32} {v['titel']}")
-        for name, wert in v.pop("felder").items():
-            if name not in ("Datum", "Ort", "Disziplinen"):
-                print(f"{'':>18}{name}: {wert}")
+        del v["felder"]
     STATE.write_text(json.dumps({"events": hits}, ensure_ascii=False, indent=1, sort_keys=True) + "\n")
 
 
